@@ -107,7 +107,10 @@ class DataSaver(abc.ABC):
 class JSONSaver(DataSaver):
     """Класс для сохранения и загрузки вакансий в JSON-файл."""
 
-    def __init__(self, filename: str = "C:/Users/Sator/PycharmProjects/OOP_KURSOVAYA/data/vacancies.json"):
+    def __init__(
+        self,
+        filename: str = "C:/Users/Sator/PycharmProjects/OOP_KURSOVAYA/data/vacancies.json",
+    ):
         """Инициализирует объект JSONSaver."""
         self.filename = filename
         self.data = self.__load_data()
