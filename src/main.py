@@ -11,9 +11,7 @@ class APIConnector(abc.ABC):
 
     @abc.abstractmethod
     def get_vacancies(self, query: str) -> List[Dict]:
-        """
-        Получает вакансии из API.
-        """
+        """Получает вакансии из API."""
         pass
 
 
