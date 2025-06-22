@@ -5,7 +5,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-# Import your original code here
 from src.main import APIConnector
 from src.main import HHruConnector, JSONSaver, Vacancy
 
