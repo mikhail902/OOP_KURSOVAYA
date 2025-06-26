@@ -1,10 +1,19 @@
 from typing import Union
 
+
 class Vacancy:
     """Класс для работы с вакансиями."""
-    __slots__ = ('__title', '__url', '__salary_from', '__salary_to', '__description')
 
-    def __init__(self, title: str, url: str, salary_from: Union[int, None] = None, salary_to: Union[int, None] = None, description: Union[str, None] = None):
+    __slots__ = ("__title", "__url", "__salary_from", "__salary_to", "__description")
+
+    def __init__(
+        self,
+        title: str,
+        url: str,
+        salary_from: Union[int, None] = None,
+        salary_to: Union[int, None] = None,
+        description: Union[str, None] = None,
+    ):
         """Инициализирует объект вакансии."""
         self.__title = title
         self.__url = url

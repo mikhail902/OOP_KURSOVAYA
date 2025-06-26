@@ -1,8 +1,10 @@
 import re
-from typing import List, Dict
-from api_connectors import HHruConnector, APIConnector
+from typing import Dict, List
+
+from api_connectors import APIConnector, HHruConnector
+from data_savers import DataSaver, JSONSaver
 from vacancy import Vacancy
-from data_savers import JSONSaver, DataSaver
+
 
 def interact_with_user(json_saver: JSONSaver, hh_connector: HHruConnector):
     """Функция для взаимодействия с пользователем через консоль."""
@@ -11,13 +13,13 @@ def interact_with_user(json_saver: JSONSaver, hh_connector: HHruConnector):
         """Вспомогательная функция для получения вакансий с API и сохранения."""
         vacancies_data = hh_connector.get_vacancies(query)
         for data in vacancies_data:
-            salary = data['salary'] if data['salary'] else {'from': None, 'to': None}
+            salary = data["salary"] if data["salary"] else {"from": None, "to": None}
             vacancy = Vacancy(
-                data['name'],
-                data['alternate_url'],
-                salary_from=salary['from'],
-                salary_to=salary['to'],
-                description=data['snippet']['requirement'] if data['snippet'] else None
+                data["name"],
+                data["alternate_url"],
+                salary_from=salary["from"],
+                salary_to=salary["to"],
+                description=data["snippet"]["requirement"] if data["snippet"] else None,
             )
             json_saver.add_vacancy(vacancy)
             print(vacancy)
@@ -52,7 +54,9 @@ def interact_with_user(json_saver: JSONSaver, hh_connector: HHruConnector):
             all_vacancies = json_saver.get_vacancies({})
             if all_vacancies:
                 for vacancy in all_vacancies:
-                    if vacancy.description and re.search(keyword, vacancy.description, re.IGNORECASE):
+                    if vacancy.description and re.search(
+                        keyword, vacancy.description, re.IGNORECASE
+                    ):
                         print(vacancy)
             else:
                 print("Нет сохраненных вакансий.")
@@ -77,7 +81,8 @@ def interact_with_user(json_saver: JSONSaver, hh_connector: HHruConnector):
         else:
             print("Неверный выбор. Пожалуйста, выберите действие из списка.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     json_saver = JSONSaver()
     hh_connector = HHruConnector()
     interact_with_user(json_saver, hh_connector)
