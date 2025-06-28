@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List
+from typing import List
 
 from api_connectors import APIConnector, HHruConnector
 from data_savers import DataSaver, JSONSaver
@@ -9,19 +9,31 @@ from vacancy import Vacancy
 def interact_with_user(json_saver: JSONSaver, hh_connector: HHruConnector):
     """Функция для взаимодействия с пользователем через консоль."""
 
-    def get_vacancies_from_api(query: str):
-        """Вспомогательная функция для получения вакансий с API и сохранения."""
+    def get_vacancies_from_api(query: str) -> List[Vacancy]:
+        """Получает вакансии с API, преобразует в объекты Vacancy и возвращает список."""
         vacancies_data = hh_connector.get_vacancies(query)
+        new_vacancies = []
+
         for data in vacancies_data:
-            salary = data["salary"] if data["salary"] else {"from": None, "to": None}
+            salary = data.get("salary") or {"from": None, "to": None}
             vacancy = Vacancy(
-                data["name"],
-                data["alternate_url"],
+                title=data["name"],
+                url=data["alternate_url"],
                 salary_from=salary["from"],
                 salary_to=salary["to"],
-                description=data["snippet"]["requirement"] if data["snippet"] else None,
+                description=data.get("snippet", {}).get("requirement"),
             )
-            json_saver.add_vacancy(vacancy)
+            new_vacancies.append(vacancy)
+
+        return new_vacancies
+
+    def print_vacancies(vacancies: List[Vacancy]):
+        """Выводит список вакансий на экран."""
+        if not vacancies:
+            print("Нет вакансий для отображения.")
+            return
+
+        for vacancy in vacancies:
             print(vacancy)
 
     while True:
@@ -33,46 +45,49 @@ def interact_with_user(json_saver: JSONSaver, hh_connector: HHruConnector):
         print("5. Удалить вакансию")
         print("6. Выход")
 
-        choice = input("Ваш выбор: ")
+        choice = input("Ваш выбор: ").strip()
 
         if choice == "1":
-            query = input("Введите поисковый запрос для вакансий на hh.ru: ")
-            get_vacancies_from_api(query)
+            query = input("Введите поисковый запрос для вакансий на hh.ru: ").strip()
+            new_vacancies = get_vacancies_from_api(query)
+
+            existing_urls = {v.url for v in json_saver.get_vacancies({})}
+            unique_vacancies = [v for v in new_vacancies if v.url not in existing_urls]
+
+            for vacancy in unique_vacancies:
+                json_saver.add_vacancy(vacancy)
+                print(f"Добавлена: {vacancy}")
+
+            print(f"\nДобавлено {len(unique_vacancies)} новых вакансий.")
 
         elif choice == "2":
-            n = int(input("Введите количество вакансий для вывода: "))
-            all_vacancies = json_saver.get_vacancies({})
-            if all_vacancies:
-                sorted_vacancies = sorted(all_vacancies, reverse=True)
-                for i in range(min(n, len(sorted_vacancies))):
-                    print(sorted_vacancies[i])
-            else:
-                print("Нет сохраненных вакансий.")
+            try:
+                n = int(input("Введите количество вакансий для вывода: "))
+                all_vacancies = json_saver.get_vacancies({})
+                sorted_vacancies = sorted(all_vacancies, reverse=True)[:n]
+                print_vacancies(sorted_vacancies)
+            except ValueError:
+                print("Ошибка: введите число!")
 
         elif choice == "3":
-            keyword = input("Введите ключевое слово для поиска в описании вакансий: ")
+            keyword = input("Введите ключевое слово для поиска в описании: ").strip()
             all_vacancies = json_saver.get_vacancies({})
-            if all_vacancies:
-                for vacancy in all_vacancies:
-                    if vacancy.description and re.search(
-                        keyword, vacancy.description, re.IGNORECASE
-                    ):
-                        print(vacancy)
-            else:
-                print("Нет сохраненных вакансий.")
+            filtered = [
+                v
+                for v in all_vacancies
+                if v.description and re.search(keyword, v.description, re.IGNORECASE)
+            ]
+            print_vacancies(filtered)
 
         elif choice == "4":
-            all_vacancies = json_saver.get_vacancies({})
-            if all_vacancies:
-                for vacancy in all_vacancies:
-                    print(vacancy)
-            else:
-                print("Нет сохраненных вакансий.")
+            print_vacancies(json_saver.get_vacancies({}))
 
         elif choice == "5":
-            url_to_delete = input("Введите URL вакансии для удаления: ")
-            vacancy_to_delete = Vacancy("", url_to_delete)
-            json_saver.delete_vacancy(vacancy_to_delete)
+            url = input("Введите URL вакансии для удаления: ").strip()
+            if json_saver.delete_vacancy(Vacancy("", url)):
+                print("Вакансия удалена.")
+            else:
+                print("Вакансия не найдена.")
 
         elif choice == "6":
             print("Выход из программы.")

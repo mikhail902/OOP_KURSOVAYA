@@ -1,0 +1,72 @@
+# JetBrains IDE (PyCharm, IntelliJ)
+.idea/
+*.iml
+*.ipr
+*.iws
+*.ids
+*.orig
+
+# Python cache and virtualenv
+__pycache__/
+*.py[cod]
+*$py.class
+.python-version
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Build and distribution
+build/
+dist/
+*.egg-info/
+*.egg
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# VSCode
+.vscode/
+
+# Spyder
+.spyderproject
+.spyproject
+
+# PyCharm
+/.idea
+/.idea_modules
+/.idea/workspace.xml
+/.idea/tasks.xml
+/.idea/datasources.xml
+/.idea/dataSources.ids
+/.idea/sqlDataSources.xml
+/.idea/dynamic.xml
+/.idea/uiDesigner.xml

@@ -1,7 +1,20 @@
 import abc
+from abc import ABC, abstractmethod
 from typing import Dict, List
 
 import requests
+
+
+class API(ABC):
+    @abstractmethod
+    def connect(self, endpoint: str, params: dict = None):
+        """Метод для подключения к API."""
+        pass
+
+    @abstractmethod
+    def get_vacancies(self, query: str):
+        """Метод для получения вакансий."""
+        pass
 
 
 class APIConnector(abc.ABC):
